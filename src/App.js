@@ -1,25 +1,35 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Landing from './Components/Landing/landing.componenet';
+import PaymentCheckout from './Components/Checkout/paymentCheckout.component';
+import CreditCard from './Components/CreditCard';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import PricingContextProvider from "./Context/pricing.context";
+
+
+const THEME = createMuiTheme({
+    typography: {
+        fontFamily: 'Poppins\', sans-serif',
+    },
+});
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <PricingContextProvider>
+            <Router>
+                <MuiThemeProvider theme={THEME}>
+                    <div className="App">
+
+                        <Route exact path='/' component={Landing} />
+                        <Route exact path='/pricing_list' component={Landing} />
+                        <Route exact path='/payment_checkout' component={PaymentCheckout} />
+                        <Route exact path='/card' component={CreditCard} />
+                    </div>
+                </MuiThemeProvider>
+            </Router>
+        </PricingContextProvider>
+
+    );
 }
 
 export default App;

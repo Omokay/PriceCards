@@ -128,7 +128,7 @@ const ConfirmationPage = () => {
                             Cloud Storage:
                         </Typography>
                         <Typography component="h3">
-                            $ {cloudStorage} GB
+                            {cloudStorage} GB
                         </Typography>
                     </div>
                     <div className={classes.groupings}>

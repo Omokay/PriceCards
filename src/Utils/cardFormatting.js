@@ -1,7 +1,11 @@
 import Payment from "payment";
 
-export function clearNumber(value = '') {
-    return value.replace(/\D+/g, '');
+export function clearNumber(value) {
+    if (value === null) {
+        return;
+    } {
+        return value.replace(/\D+/g, '');
+    }
 }
 
 export function formatExpirationDate(value) {

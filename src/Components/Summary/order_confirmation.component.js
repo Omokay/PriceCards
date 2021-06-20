@@ -149,7 +149,7 @@ const ConfirmationPage = () => {
                             ${amount}
                         </Typography>
                     </div>
-                    <Typography className={classes.actionColor}>
+                    <Typography>
                         {currentUser}
                     </Typography>
                     <div style={{

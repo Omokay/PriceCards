@@ -1,13 +1,21 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import {PricingContext} from '../../Context/pricing.context';
 
 
 
-const RadioButtonsGroup = ({ formLabel, name, value, radioButton, handleChange, }) => {
+const RadioButtonsGroup = ({ formLabel, name, value, radioButton }) => {
+
+    const {setStorage} = useContext(PricingContext);
+
+    const handleChange = async (event) => {
+        console.log(event.target.value);
+        await setStorage(event.target.value);
+    };
 
     return (
         <FormControl component="fieldset">

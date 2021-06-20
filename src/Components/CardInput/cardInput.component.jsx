@@ -11,7 +11,7 @@ import FormControl from '@material-ui/core/FormControl';
 
 
 
-const CardInput = ({ image, label, labelWidth, name, value, handleChange, type, onFocus, pattern,required }) => {
+const CardInput = ({ image, label, labelWidth, name, value, handleChange, type,required }) => {
 
 
     const useStyles = makeStyles((theme) => ({
@@ -27,7 +27,6 @@ const CardInput = ({ image, label, labelWidth, name, value, handleChange, type, 
         },
         textField: {
             width: '400px',
-            paddingBottom: '10px',
         },
     }));
 
@@ -43,13 +42,11 @@ const CardInput = ({ image, label, labelWidth, name, value, handleChange, type, 
                     type={type}
                     value={value}
                     onChange={handleChange}
-                    onFocus={onFocus}
                     name={name}
                     required = {required}
-                    pattern={pattern}
                     endAdornment={
                         <InputAdornment position="end">
-                            <img src={image} alt='card' />
+                            <img src={image} alt='img' />
                         </InputAdornment>
                     }
                     labelWidth={labelWidth}

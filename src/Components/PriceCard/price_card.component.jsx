@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
@@ -12,6 +12,8 @@ import RadioButtonsGroup from "../RadioButton/radioButton.component";
 import RadioButtonsGroup2 from "../RadioButton2/radioButton2.component";
 import ActionButton from "../ActionButton/actionButton.component";
 import { PricingContext } from '../../Context/pricing.context';
+import {baseUrl, httpGet} from "../../Http_Requests/axios_get";
+import getTotal from "../../Utils/subscription_total";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -34,19 +36,20 @@ const useStyles = makeStyles((theme) => ({
 
 const PriceCard = () => {
 
-    const { card, setCard, prices, setPrices, setAmount, isUpfront, setIsUpfront, cloudStorage, setStorage } = useContext(PricingContext);
+    const history = useHistory();
+    const { card, setCard, setAmount, prices, setPrices, isUpfront, setIsUpfront, setStorage, cloudStorage, unitPrice, setUnitPrice } = useContext(PricingContext);
+
+
+    useEffect(() => {
+        const total = getTotal(cloudStorage, isUpfront, unitPrice);
+        console.log('Total Amount to pay ' + total);
+        setAmount(total);
+    }, [card, unitPrice, isUpfront, cloudStorage])
 
     const getPrices = () => {
-        axios.get(`https://cloud-storage-prices-moberries.herokuapp.com/prices`).then((res) => {
-            setPrices(res.data['subscription_plans'])
-        },
-            (err) => {
-                if (err) {
-                    console.log(err);
-                }
-            });
-
-
+        httpGet(`${baseUrl}`).then(res => {
+            setPrices(res['subscription_plans']);
+        })
     }
 
     useEffect(() => {
@@ -54,34 +57,35 @@ const PriceCard = () => {
     }, []);
 
     const classes = useStyles();
-    const [unitPrice, setUnitPrice] = useState(0)
 
-    const handleChange = async (event) => {
-
-        if (event.target.name === 'amount') {
-            await setStorage(event.target.value);
-        }
-        if (event.target.name === 'upfront_payment') {
-            await setIsUpfront(event.target.value);
-        }
-
-    };
 
     const handleCardClick = async (price) => {
         const plan = price['duration_months'];
+        const price_gb = price['price_usd_per_gb'];
+        console.log(price_gb);
+        setUnitPrice(price_gb);
+
         if (plan === 3) {
-            setUnitPrice(3)
+            await setUnitPrice(3)
             await setCard(3);
+
         }
         else if (plan === 6) {
-            setUnitPrice(2.5)
+            await setUnitPrice(2.5)
             await setCard(6);
         }
         else if (plan === 12) {
-            setUnitPrice(5)
+            await setUnitPrice(2)
             await setCard(12);
         }
+        console.log(card + ' Months');
     };
+
+    const handleBuy = () => {
+        history.push('/payment_checkout');
+    }
+
+
 
     return (
         <Grid container className={classes.root} spacing={2}>
@@ -94,16 +98,13 @@ const PriceCard = () => {
                                 cursor: 'pointer',
                                 marginBottom: '10px',
                                 padding: '15px',
-                                // border: price['duration_months'] === card ? "border solid red" : ""
                                 border: price['duration_months'] === card ? "solid 2px red" : ""
                             }}>
                                 <CardHeader
                                     title={price['duration_months'] === 3 ? "Basic" :price ['duration_months'] === 6 ? "Standard" : price['duration_months'] === 12 ? "Premium" : ""}
                                     titleTypographyProps={{ align: 'center' }}
                                     className={classes.cardHeader}
-                                    subheader={<Typography style={{
-
-                                    }}>
+                                    subheader={<Typography>
                                      { price.duration_months}   Months
                                     </Typography>}
                                     style={{
@@ -134,8 +135,7 @@ const PriceCard = () => {
                                             padding: '10px 0',
                                         }}>
                                             <RadioButtonsGroup
-                                                handleChange={handleChange}
-                                                value={cloudStorage}  // Manipulate Data here
+                                                value={(card === price['duration_months']) ? cloudStorage : null }  // Manipulate Data here
                                                 formLabel='Storage Amount (GB)' name='amount' radioButton={['5', '10', '50']}
 
 
@@ -145,8 +145,7 @@ const PriceCard = () => {
                                             listStyle: 'none',
                                         }}>
                                             <RadioButtonsGroup2
-                                                handleChange={handleChange}
-                                                value={isUpfront}    // Manipulate Data here.
+                                                value={(card === price['duration_months']) ? isUpfront : null}    // Manipulate Data here.
                                                 formLabel='Upfront Payment' name='upfront_payment' radioButton={['No', 'Yes']} />
                                         </li>
                                     </ul>
@@ -157,8 +156,8 @@ const PriceCard = () => {
                                     height: '100px',
                                 }}>
 
-                                    <Link to={(card === prices.duration_months ? '/payment_checkout' : '#')}
-
+                                    <Link
+                                        to={(card === prices.duration_months ? '/payment_checkout' : '#')}
                                         style={{
                                             margin: '0 auto',
                                             textDecoration: 'none',
@@ -169,6 +168,10 @@ const PriceCard = () => {
                                             height='50px'
                                             backgroundColor='#dd1843'
                                             color='white'
+                                            handleClick={handleBuy}
+                                            style={{
+                                                zIndex: '999',
+                                            }}
                                         />
                                     </Link>
                                 </CardActions>
